@@ -7,7 +7,9 @@ import { XMarkIcon } from '@heroicons/vue/24/solid';
 const appSettings = useAppSettings();
 const { t } = useI18n();
 
-const DEFAULT_LOGO_URL = '/logo.svg';
+// Same value the settings store produces for an unbranded install, so the
+// "is this the default logo" comparison keeps working under a path prefix.
+const DEFAULT_LOGO_URL = `${(import.meta.env.BASE_URL || '/').replace(/\/+$/, '')}/logo.svg`;
 const MAX_LOGO_BYTES = 2 * 1024 * 1024;
 const LOGO_TYPES = ['image/svg+xml', 'image/png', 'image/jpeg'];
 

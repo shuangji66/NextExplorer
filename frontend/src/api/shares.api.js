@@ -129,6 +129,14 @@ function setGuestSession(sessionId, shareToken = '') {
   }
 }
 
+/**
+ * Where the application is mounted. It is not always the origin root: a NAS
+ * gateway publishes it under a path prefix, and a link built from the origin
+ * alone points at the gateway instead of at the app.
+ */
+const appBasePath = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+const appBaseUrl = () => `${window.location.origin}${appBasePath}`;
+
 function getGuestSessionShareToken() {
   return sessionStorage.getItem('guestSessionShareToken');
 }
@@ -137,7 +145,7 @@ function getGuestSessionShareToken() {
  * Generate share URL for a token
  */
 function getShareUrl(shareToken) {
-  const baseUrl = window.location.origin;
+  const baseUrl = appBaseUrl();
   return `${baseUrl}/share/${shareToken}`;
 }
 
@@ -158,7 +166,7 @@ function normalizeDirectShareFileMode(mode) {
  * Generate direct shared file URL for a token and optional inner path
  */
 function getDirectShareFileUrl(shareToken, innerPath = '', mode = 'auto') {
-  const baseUrl = window.location.origin;
+  const baseUrl = appBaseUrl();
   const encodedToken = encodeURIComponent(shareToken);
   const normalizedInnerPath = normalizePath(innerPath);
   const encodedInnerPath = encodePath(normalizedInnerPath);
@@ -173,7 +181,7 @@ function getDirectShareFileUrl(shareToken, innerPath = '', mode = 'auto') {
 }
 
 function getDirectShareEditorUrl(shareToken, innerPath = '') {
-  const baseUrl = window.location.origin;
+  const baseUrl = appBaseUrl();
   const encodedToken = encodeURIComponent(shareToken);
   const encodedInnerPath = encodePath(normalizePath(innerPath));
   return encodedInnerPath

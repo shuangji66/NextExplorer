@@ -4,14 +4,14 @@ import { useI18n } from 'vue-i18n';
 
 const props = defineProps({
   appname: { type: String, default: 'Explorer' },
-  logoUrl: { type: String, default: '/logo.svg' },
+  logoUrl: { type: String, default: `${(import.meta.env.BASE_URL || '/').replace(/\/+$/, '')}/logo.svg` },
 });
 
 const { t } = useI18n();
 
 const logoSrc = computed(() => {
   const candidate = typeof props.logoUrl === 'string' ? props.logoUrl.trim() : '';
-  return candidate || '/logo.svg';
+  return candidate || `${(import.meta.env.BASE_URL || '/').replace(/\/+$/, '')}/logo.svg`;
 });
 
 // The one piece of the header a screen reader has to be told, and it was the

@@ -1,4 +1,19 @@
 import { defineStore } from 'pinia';
+
+/**
+ * The path the app is mounted under (empty at the root). The server describes
+ * its own assets in root-absolute terms, so anything it names has to be moved
+ * under that path before the browser is asked for it.
+ */
+const appBasePath = (import.meta.env.BASE_URL || '/').replace(/\/+$/, '');
+
+const DEFAULT_LOGO_URL = `${appBasePath}/logo.svg`;
+
+const withBasePath = (url) => {
+  if (typeof url !== 'string' || !url.startsWith('/') || url.startsWith('//')) return url;
+  if (appBasePath && (url === appBasePath || url.startsWith(`${appBasePath}/`))) return url;
+  return `${appBasePath}${url}`;
+};
 import { ref, computed, watch } from 'vue';
 import {
   getBranding as getBrandingApi,
@@ -79,7 +94,7 @@ export const useAppSettings = defineStore('appSettings', () => {
 
   // Three-tier settings structure
   const publicSettings = ref({
-    branding: { appName: 'Explorer', appLogoUrl: '/logo.svg', showPoweredBy: false },
+    branding: { appName: 'Explorer', appLogoUrl: DEFAULT_LOGO_URL, showPoweredBy: false },
   });
 
   const userSettings = ref(createDefaultUserSettings());
@@ -135,11 +150,16 @@ export const useAppSettings = defineStore('appSettings', () => {
     lastError.value = null;
     try {
       const b = await getBrandingApi();
+      const branding = b || {};
       publicSettings.value.branding = {
         appName: 'Explorer',
-        appLogoUrl: '/logo.svg',
+        appLogoUrl: DEFAULT_LOGO_URL,
         showPoweredBy: false,
-        ...(b || {}),
+        ...branding,
+        // The server hands this out as a root-absolute path ('/logo.svg', or
+        // '/static/logos/x.svg' for an uploaded one), which is where the app is
+        // only when it is mounted at the root.
+        appLogoUrl: withBasePath(branding.appLogoUrl || DEFAULT_LOGO_URL),
       };
     } catch (e) {
       console.debug('Failed to load branding:', e?.message || 'Unknown error');
@@ -162,9 +182,10 @@ export const useAppSettings = defineStore('appSettings', () => {
       if (s?.branding) {
         publicSettings.value.branding = {
           appName: 'Explorer',
-          appLogoUrl: '/logo.svg',
+          appLogoUrl: DEFAULT_LOGO_URL,
           showPoweredBy: false,
           ...s.branding,
+          appLogoUrl: withBasePath(s.branding.appLogoUrl || DEFAULT_LOGO_URL),
         };
       }
 
@@ -276,9 +297,10 @@ export const useAppSettings = defineStore('appSettings', () => {
       if (updated?.branding) {
         publicSettings.value.branding = {
           appName: 'Explorer',
-          appLogoUrl: '/logo.svg',
+          appLogoUrl: DEFAULT_LOGO_URL,
           showPoweredBy: false,
           ...updated.branding,
+          appLogoUrl: withBasePath(updated.branding.appLogoUrl || DEFAULT_LOGO_URL),
         };
       }
 

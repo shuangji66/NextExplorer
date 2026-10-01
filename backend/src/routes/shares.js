@@ -107,7 +107,9 @@ const setGuestSessionCookie = (req, res, sessionId) => {
 
 const buildPublicBaseUrl = (req) => {
   const { public: publicConfig } = require('../config/index');
-  return publicConfig.origin || `${req.protocol}://${req.get('host')}`;
+  // `url` keeps the path of PUBLIC_URL, which is where the app is published when
+  // a gateway mounts it under a prefix; `origin` alone would drop it.
+  return publicConfig.url || publicConfig.origin || `${req.protocol}://${req.get('host')}`;
 };
 
 const encodeUrlPath = (value = '') =>
