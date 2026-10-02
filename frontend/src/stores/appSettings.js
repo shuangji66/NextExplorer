@@ -81,6 +81,7 @@ export const useAppSettings = defineStore('appSettings', () => {
 
   const createDefaultSystemSettings = () => ({
     thumbnails: { enabled: true, size: 200, quality: 70, concurrency: 10 },
+    ffmpeg: { ffmpegPath: null, ffprobePath: null },
     access: { rules: [] },
     uploads: { chunkedEnabled: false, chunkSizeBytes: 8 * 1024 * 1024 },
     folderSize: { excludedPaths: [], environmentExcludedPaths: [] },
@@ -121,6 +122,7 @@ export const useAppSettings = defineStore('appSettings', () => {
     branding: publicSettings.value.branding,
     user: userSettings.value,
     thumbnails: systemSettings.value.thumbnails,
+    ffmpeg: systemSettings.value.ffmpeg,
     access: systemSettings.value.access,
     uploads: systemSettings.value.uploads,
     folderSize: systemSettings.value.folderSize,
@@ -204,6 +206,13 @@ export const useAppSettings = defineStore('appSettings', () => {
           size: 200,
           quality: 70,
           ...s.thumbnails,
+        };
+      }
+      if (userId === authStore.currentUser?.id && s?.ffmpeg) {
+        systemSettings.value.ffmpeg = {
+          ffmpegPath: null,
+          ffprobePath: null,
+          ...s.ffmpeg,
         };
       }
       if (userId === authStore.currentUser?.id && s?.access) {
@@ -317,6 +326,13 @@ export const useAppSettings = defineStore('appSettings', () => {
           size: 200,
           quality: 70,
           ...updated.thumbnails,
+        };
+      }
+      if (updated?.ffmpeg) {
+        systemSettings.value.ffmpeg = {
+          ffmpegPath: null,
+          ffprobePath: null,
+          ...updated.ffmpeg,
         };
       }
 
